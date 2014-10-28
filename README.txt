@@ -32,7 +32,7 @@ No. But it’s not hard to get one - if you are interested in learning more abou
 
 == Changelog ==
 
-= 0,3 =
+= 0.3 =
 * Added shortcodes for embedding ITERAS content (iteras-signup, iteras-selfservice, iteras-paywall-login)
 * Added danish translation
 
