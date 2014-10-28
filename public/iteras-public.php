@@ -15,7 +15,7 @@
  */
 class Iteras {
 
-  const VERSION = '0.2';
+  const VERSION = '0.3';
 
   const SETTINGS_KEY = "iteras_settings";
   const POST_META_KEY = "iteras_paywall";
@@ -40,6 +40,10 @@ class Iteras {
     add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
     add_filter('the_content', array( $this, 'potentially_paywall_content' ));
+
+    add_shortcode( 'iteras-signup', array( $this, 'signup_shortcode') );
+    add_shortcode( 'iteras-paywall-login', array( $this, 'paywall_shortcode') );
+    add_shortcode( 'iteras-selfservice', array( $this, 'selfservice_shortcode') );
   }
 
 
@@ -163,12 +167,7 @@ class Iteras {
 
   public function load_plugin_textdomain() {
     // Load the plugin text domain for translation.
-
-    $domain = $this->plugin_slug;
-    $locale = apply_filters( 'plugin_locale', get_locale(), $domain );
-
-    load_textdomain( $domain, trailingslashit( WP_LANG_DIR ) . $domain . '/' . $domain . '-' . $locale . '.mo' );
-    load_plugin_textdomain( $domain, FALSE, basename( plugin_dir_path( dirname( __FILE__ ) ) ) . '/languages/' );
+    load_plugin_textdomain( $this->plugin_slug, false, plugin_basename(ITERAS_PLUGIN_PATH) . '/languages/' );
   }
 
 
@@ -206,9 +205,11 @@ class Iteras {
 
 
   public function enqueue_scripts() {
-    // include the itearas javascript api
-    if (WP_DEBUG)
+    // include the iteras javascript api
+    if (ITERAS_DEBUG) {
       $url = "http://iteras.localhost:8000/media/api/iteras.js"; //"http://app-test.iteras.dk/static/api/iteras.js";
+      wp_enqueue_script( $this->plugin_slug . '-api-script-debug',  "http://iteras.localhost:8000/media/api/debug.js");
+    }
     else
       $url = "https://app.iteras.dk/static/api/iteras.js";
 
@@ -233,5 +234,47 @@ class Iteras {
     }
 
     return $content;
+  }
+
+  function combine_attributes($attrs) {
+    if (!$attrs or empty($attrs))
+      return "";
+
+    $transformed = [];
+
+    foreach ($attrs as $key => $value)
+      if ($value)
+        array_push($transformed, '"'.$key.'": "'.$value.'"');
+
+    if (!empty($transformed))
+      return ", ".join(", ", $transformed);
+    else
+      return "";
+  }
+
+  // [iteras-signup signupid="3for1"]
+  function signup_shortcode($attrs) {
+    return '<script>
+      document.write(Iteras.signupiframe({
+        "profile": "'.$this->settings['profile_name'].'"'.$this->combine_attributes($attrs).'
+      }));</script>';
+  }
+
+  // [iteras-paywall-login]
+  function paywall_shortcode($attrs) {
+    return '<script>
+      document.write(Iteras.paywalliframe({
+        "profile": "'.$this->settings['profile_name'].'",
+        "paywallid": "'.$this->settings['paywall_id'].'"'.$this->combine_attributes($attrs).'
+      }));</script>';
+  }
+
+
+  // [iteras-selfservice]
+  function selfservice_shortcode($attrs) {
+    return '<script>
+      document.write(Iteras.selfserviceiframe({
+        "profile": "'.$this->settings['profile_name'].'"'.$this->combine_attributes($attrs).'
+      }));</script>';
   }
 }

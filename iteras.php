@@ -12,7 +12,7 @@
  * Plugin Name:       ITERAS
  * Plugin URI:        http://app.iteras.dk
  * Description:       Integration with ITERAS, a cloud-based state-of-the-art system for managing subscriptions and payments for magazines.
- * Version:           0.2
+ * Version:           0.3
  * Author:            ITERAS
  * Author URI:        http://www.iteras.dk
  * Text Domain:       iteras
@@ -30,6 +30,14 @@ if ( ! defined( 'WPINC' ) ) {
 /*----------------------------------------------------------------------------*
  * Public-Facing Functionality
  *----------------------------------------------------------------------------*/
+
+$local_settings = plugin_dir_path( __FILE__ ) . 'local-settings.php';
+if (file_exists($local_settings))
+  include(plugin_dir_path( __FILE__ ) . 'local-settings.php');
+else
+  define("ITERAS_DEBUG", false);
+
+define("ITERAS_PLUGIN_PATH", plugin_dir_path( __FILE__ ));
 
 require_once( plugin_dir_path( __FILE__ ) . 'includes/debug.php' );
 require_once( plugin_dir_path( __FILE__ ) . 'public/iteras-public.php' );

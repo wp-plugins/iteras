@@ -2,7 +2,7 @@
 Tags: paywall, subscribe, subscriptions, subscription, subscribers, access-control, paid content, premium, premium content, monetize, magazine, media pass, registration, billing, membership, member, earn money
 Requires at least: 3.5.1
 Tested up to: 4.0
-Stable tag: 0.2
+Stable tag: 0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,10 @@ The plugin uses the ITERAS Javascript API that also allows further customization
 No. But it’s not hard to get one - if you are interested in learning more about ITERAS, please visit [iteras.dk](https://www.iteras.dk/) and contact us.
 
 == Changelog ==
+
+= 0,3 =
+* Added shortcodes for embedding ITERAS content (iteras-signup, iteras-selfservice, iteras-paywall-login)
+* Added danish translation
 
 = 0.2 =
 * First public release
