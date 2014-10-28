@@ -28,11 +28,8 @@ class Iteras_Admin {
     $this->plugin = Iteras::get_instance();
     $this->plugin_slug = $this->plugin->get_plugin_slug();
 
-    $this->access_levels = array(
-      "" => __('Everybody', $this->plugin_slug),
-      //"user" => __('Registered accounts', $this->plugin_slug),
-      "sub" => __('Paying subscribers', $this->plugin_slug),
-    );
+    add_action( 'init', array( $this, 'load_settings' ) );
+    add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 
     // Load admin style sheet and JavaScript.
     //add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
@@ -47,6 +44,19 @@ class Iteras_Admin {
 
     add_action( 'load-post.php', array( $this, 'paywall_post_meta_boxes_setup' ) );
     add_action( 'load-post-new.php', array( $this, 'paywall_post_meta_boxes_setup' ) );
+  }
+
+  public function load_settings() {
+    $this->access_levels = array(
+      "" => __('Everybody', $this->plugin_slug),
+      //"user" => __('Registered accounts', $this->plugin_slug),
+      "sub" => __('Paying subscribers', $this->plugin_slug),
+    );
+  }
+
+  public function load_plugin_textdomain() {
+    // Load the plugin text domain for translation.
+    load_plugin_textdomain( $this->plugin_slug, false, plugin_basename(ITERAS_PLUGIN_PATH) . '/languages/' );
   }
 
 
@@ -76,6 +86,7 @@ class Iteras_Admin {
 
     $settings = $this->plugin->settings;
     $settings_url = admin_url( 'options-general.php?page=' . $this->plugin_slug );
+    $domain = $this->plugin_slug;
 
     include_once( 'views/post-meta-box.php' );
   }
@@ -164,6 +175,7 @@ class Iteras_Admin {
 
     // template context
     $settings = $this->plugin->settings;
+    $domain = $this->plugin_slug;
 
     include_once( 'views/admin.php' );
 

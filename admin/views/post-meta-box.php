@@ -2,7 +2,7 @@
 
 wp_nonce_field( "post".$post->ID, 'iteras_paywall_post_nonce' );
 
-echo __('Who should be able to access this post?')."<br>";
+echo __('Who should be able to access this post?', $domain)."<br>";
 
 $i = 1;
 foreach ($this->access_levels as $level => $label) {
@@ -14,6 +14,6 @@ foreach ($this->access_levels as $level => $label) {
 }
 
 if (!$settings['profile_name'] or !$settings['paywall_id'] or !$settings['subscribe_url'])
-  echo '<br><p class="description error">'.strtr(__("The ITERAS settings haven't been filled in properly. Go to the <a href='%url%'>settings page</a> to correct them."), array('%url%' => $settings_url)).'</p>';
+  echo '<br><p class="description error">'.strtr(__("The ITERAS settings haven't been filled in properly. Go to the <a href='%url%'>settings page</a> to correct them.", $domain), array('%url%' => $settings_url)).'</p>';
 
 ?>
