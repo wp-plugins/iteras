@@ -29,12 +29,12 @@ class Iteras {
 
 
   private function __construct() {
+    // run migrations if needed
+    self::migrate();
+
     // Load plugin text domain
     add_action( 'init', array( $this, 'load_settings' ) );
     add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
-
-    // run migrations after updates
-    add_action( 'plugins_loaded', array( $this, 'plugin_updated' ) );
 
     // Activate plugin when new blog is added
     add_action( 'wpmu_new_blog', array( $this, 'activate_new_site' ) );
@@ -176,10 +176,6 @@ class Iteras {
       $settings['version'] = $new_version;
       update_option(self::SETTINGS_KEY, $settings);
     }
-  }
-
-  public function plugin_updated() {
-    self::migrate();
   }
 
   private static function single_deactivate() {
