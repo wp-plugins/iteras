@@ -270,9 +270,9 @@ class Iteras {
 
           $extra = $extra.'<script>Iteras.wall({ unauthorized: iterasPaywallContent, access: "'.$paywall.'" });</script>';
         }
-      }
-      else {
-        $extra = '<script>Iteras.wall({ redirect: "'.$this->settings['subscribe_url'].'", access: "'.$paywall.'" });</script>';
+        else {
+          $extra = '<script>Iteras.wall({ redirect: "'.$this->settings['subscribe_url'].'", access: "'.$paywall.'" });</script>';
+        }
       }
 
       $content = '<div class="iteras-content-wrapper">'.$content.'</div>'.$extra;
