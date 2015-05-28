@@ -21,6 +21,19 @@
       </tr>
 
       <tr>
+        <th scope="row"><label for="defaultaccess"><?php _e('Default paywall access', $domain); ?></label></th>
+        <td>
+          <select id="defaultaccess" name="default_access">
+            <?php foreach ($this->access_levels as $level => $label) { ?>
+            <option value="<?=$level?>" <?php if ($settings['default_access'] == $level) echo 'selected="selected"' ?> ><?=$label?></option>
+            <?php } ?>
+          </select>
+
+          <p class="description"><?php _e('Default paywall access for new posts.', $domain); ?></p>
+        </td>
+      </tr>
+
+      <tr>
         <th scope="row"><label for="subscribeurl"><?php _e('Subscribe landing page', $domain); ?></label></th>
         <td>
           <input class="regular-text" id="subscribeurl" name="subscribe_url" placeholder="<?php _e('e.g. /?page_id=1', $domain); ?>" type="text" value="<?=$settings['subscribe_url']; ?>">
@@ -37,15 +50,28 @@
       </tr>
 
       <tr>
-        <th scope="row"><label for="defaultaccess"><?php _e('Default paywall access', $domain); ?></label></th>
+        <th scope="row"><label for="paywall_display_type"><?php _e('Access restriction', $domain); ?></label></th>
         <td>
-          <select id="defaultaccess" name="default_access">
-            <?php foreach ($this->access_levels as $level => $label) { ?>
-            <option value="<?=$level?>" <?php if ($settings['default_access'] == $level) echo 'selected="selected"' ?> ><?=$label?></option>
+          <select id="paywall_display_type" name="paywall_display_type">
+            <?php foreach ($this->paywall_display_types as $type => $label) { ?>
+            <option value="<?=$type?>" <?php if ($settings['paywall_display_type'] == $type) echo 'selected="selected"' ?> ><?=$label?></option>
             <?php } ?>
           </select>
 
-          <p class="description"><?php _e('Default paywall access for new posts.', $domain); ?></p>
+          <p class="description"><?php _e("How users will be greeted on an article they don't have access to.", $domain); ?></p>
+        </td>
+      </tr>
+
+      <tr class="box-type">
+        <th scope="row"><label for="paywall_snippet_size"><?php _e('Cut text at', $domain); ?></label></th>
+        <td>
+          <input class="regular-text" name="paywall_snippet_size" style="width:6em;" placeholder="<?php _e('e.g. 30', $domain); ?>" type="text" value="<?=$settings['paywall_snippet_size']; ?>"> <?php _e('characters', $domain); ?>
+        </td>
+      </tr>
+      <tr class="box-type">
+        <th scope="row"><label for="paywall_box"><?php _e('Call-to-action content', $domain); ?></label></th>
+        <td>
+          <?php wp_editor($settings['paywall_box'], "paywall_box"); ?>
         </td>
       </tr>
     </table>

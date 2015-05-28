@@ -33,7 +33,7 @@ class Iteras_Admin {
 
     // Load admin style sheet and JavaScript.
     //add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
-    //add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+    add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 
     // Add the options page and menu item.
     add_action( 'admin_menu', array( $this, 'add_plugin_admin_menu' ) );
@@ -51,6 +51,11 @@ class Iteras_Admin {
       "" => __('Everybody', $this->plugin_slug),
       //"user" => __('Registered accounts', $this->plugin_slug),
       "sub" => __('Paying subscribers', $this->plugin_slug),
+    );
+
+    $this->paywall_display_types = array(
+      "redirect" => __('Redirect to subscribe landing page', $this->plugin_slug),
+      "samepage" => __('Cut text and add call-to-action box', $this->plugin_slug),
     );
   }
 
@@ -205,6 +210,9 @@ class Iteras_Admin {
       'subscribe_url' => sanitize_text_field($_POST['subscribe_url']),
       'user_url' => sanitize_text_field($_POST['user_url']),
       'default_access' => sanitize_text_field($_POST['default_access']),
+      'paywall_display_type' => sanitize_text_field($_POST['paywall_display_type']),
+      'paywall_box' => stripslashes($_POST['paywall_box']),
+      'paywall_snippet_size' => sanitize_text_field($_POST['paywall_snippet_size']),
     );
 
     $this->plugin->save_settings($settings);

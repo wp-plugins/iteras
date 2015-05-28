@@ -15,10 +15,11 @@
  */
 class Iteras {
 
-  const VERSION = '0.3';
+  const VERSION = '0.4';
 
   const SETTINGS_KEY = "iteras_settings";
   const POST_META_KEY = "iteras_paywall";
+  const DEFAULT_ARTICLE_SNIPPET_SIZE = 300;
 
   protected $plugin_slug = 'iteras';
 
@@ -36,7 +37,7 @@ class Iteras {
     add_action( 'wpmu_new_blog', array( $this, 'activate_new_site' ) );
 
     // Load public-facing style sheet and JavaScript.
-    //add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+    add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
     add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
     add_filter('the_content', array( $this, 'potentially_paywall_content' ));
@@ -156,7 +157,13 @@ class Iteras {
     if (!empty($settings) and version_compare(self::VERSION, $settings['version'], "gt")) {
       $old_version = $settings['version'];
       $new_version = self::VERSION;
+
       // do version upgrades here
+      if ($new_version == "0.4") {
+        $settings['paywall_display_type'] = 'redirect';
+        $settings['paywall_box'] = '';
+        $settings['paywall_snippet_size'] = self::DEFAULT_ARTICLE_SNIPPET_SIZE;
+      }
     }
   }
 
@@ -181,6 +188,9 @@ class Iteras {
         'subscribe_url' => "",
         'user_url' => "",
         'default_access' => "",
+        'paywall_display_type' => "redirect",
+        'paywall_box' => "",
+        'paywall_snippet_size' => self::DEFAULT_ARTICLE_SNIPPET_SIZE,
         'version' => self::VERSION,
       );
 
@@ -207,15 +217,18 @@ class Iteras {
   public function enqueue_scripts() {
     // include the iteras javascript api
     if (ITERAS_DEBUG) {
-      $url = "http://iteras.localhost:8000/media/api/iteras.js"; //"http://app-test.iteras.dk/static/api/iteras.js";
-      wp_enqueue_script( $this->plugin_slug . '-api-script-debug',  "http://iteras.localhost:8000/media/api/debug.js");
+      //$url = "http://iteras.localhost:8000/media/api/iteras.js"; //"http://app-test.iteras.dk/static/api/iteras.js";
+      //wp_enqueue_script( $this->plugin_slug . '-api-script-debug',  "http://iteras.localhost:8000/media/api/debug.js");
+      $url = "http://aura.beta.iola.dk/media/api/iteras.js";
+      wp_enqueue_script( $this->plugin_slug . '-api-script-debug',  "http://aura.beta.iola.dk/media/api/debug.js");
     }
     else
       $url = "https://app.iteras.dk/static/api/iteras.js";
 
     wp_enqueue_script( $this->plugin_slug . '-api-script', $url );
 
-    //wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js', __FILE__ ), array( 'jquery' ), self::VERSION );
+    wp_enqueue_script( $this->plugin_slug . '-plugin-script-truncate', plugins_url( 'assets/js/truncate.js', __FILE__ ), array( 'jquery' ), self::VERSION );
+    wp_enqueue_script( $this->plugin_slug . '-plugin-script-box', plugins_url( 'assets/js/box.js', __FILE__ ), array( 'jquery' ), self::VERSION );
   }
 
   public function potentially_paywall_content($content) {
@@ -223,14 +236,36 @@ class Iteras {
 
     if ( is_single() ) {
       $paywall = get_post_meta( $post->ID, self::POST_META_KEY, true );
-
+      
       $extra = "";
       if (!$this->settings['subscribe_url'])
         $extra = '<!-- ITERAS paywall enabled but not configured properly  -->';
-      elseif (in_array($paywall, array("user", "sub")))
-        $extra = '<script>Iteras.wall({ redirect: "'.$this->settings['subscribe_url'].'", access: "'.$paywall.'" });</script>';
+      elseif (in_array($paywall, array("user", "sub"))) {
+        if ($this->settings['paywall_display_type'] == "samepage") {
 
-      $content = $extra.$content;
+          if ($this->settings['paywall_box']) {
+            // remove the the_content filter so we don't process twice
+            remove_filter( current_filter(), array( $this, __FUNCTION__) );
+            $box_content = apply_filters( 'the_content', $this->settings['paywall_box'] );
+          }
+          else
+            $box_content = "<p>" + __("ITERAS plugin improperly configured. Paywall box content is missing", $this->plugin_slug) + "</p>";
+            //$box_content = '<script>document.write(Iteras.paywalliframe({ profile: "'.$this->settings['profile_name'].'", paywallid: "'.$this->settings['paywall_id'].'" }));</script>';
+
+          $extra = sprintf(
+            file_get_contents(plugin_dir_path( __FILE__ ) . 'views/box.php'),
+            $this->settings['paywall_snippet_size'],
+            $box_content
+          );
+
+          $extra = $extra.'<script>Iteras.wall({ unauthorized: iterasPaywallContent, access: "'.$paywall.'" });</script>';
+        }
+      }
+      else {
+        $extra = '<script>Iteras.wall({ redirect: "'.$this->settings['subscribe_url'].'", access: "'.$paywall.'" });</script>';
+      }
+
+      $content = '<div class="iteras-content-wrapper">'.$content.'</div>'.$extra;
     }
 
     return $content;
