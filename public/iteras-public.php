@@ -164,6 +164,10 @@ class Iteras {
         $settings['paywall_box'] = '';
         $settings['paywall_snippet_size'] = self::DEFAULT_ARTICLE_SNIPPET_SIZE;
       }
+
+      wp_cache_delete(self::SETTINGS_KEY);
+      $settings['version'] = $new_version;
+      update_option(self::SETTINGS_KEY, $settings);
     }
   }
 
