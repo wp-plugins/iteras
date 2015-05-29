@@ -166,7 +166,7 @@ class Iteras {
       $new_version = self::VERSION;
 
       // do version upgrades here
-      if ($new_version == "0.4" || $new_version == "0.4.1") {
+      if ($old_version == "0.3" && ($new_version == "0.4" || $new_version == "0.4.1")) {
         $settings['paywall_display_type'] = 'redirect';
         $settings['paywall_box'] = '';
         $settings['paywall_snippet_size'] = self::DEFAULT_ARTICLE_SNIPPET_SIZE;
