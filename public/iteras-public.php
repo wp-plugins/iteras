@@ -15,7 +15,7 @@
  */
 class Iteras {
 
-  const VERSION = '0.4';
+  const VERSION = '0.4.1';
 
   const SETTINGS_KEY = "iteras_settings";
   const POST_META_KEY = "iteras_paywall";
@@ -166,7 +166,7 @@ class Iteras {
       $new_version = self::VERSION;
 
       // do version upgrades here
-      if ($new_version == "0.4") {
+      if ($new_version == "0.4" || $new_version == "0.4.1") {
         $settings['paywall_display_type'] = 'redirect';
         $settings['paywall_box'] = '';
         $settings['paywall_snippet_size'] = self::DEFAULT_ARTICLE_SNIPPET_SIZE;
@@ -255,8 +255,8 @@ class Iteras {
 
           if ($this->settings['paywall_box']) {
             // remove the the_content filter so we don't process twice
-            remove_filter( current_filter(), array( $this, __FUNCTION__) );
-            $box_content = apply_filters( 'the_content', $this->settings['paywall_box'] );
+            //remove_filter( current_filter(), array( $this, __FUNCTION__) );
+            $box_content = apply_filters( 'do_shortcode', $this->settings['paywall_box'] );
           }
           else
             $box_content = "<p>" + __("ITERAS plugin improperly configured. Paywall box content is missing", $this->plugin_slug) + "</p>";
