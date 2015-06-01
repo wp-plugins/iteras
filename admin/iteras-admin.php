@@ -28,15 +28,12 @@ class Iteras_Admin {
     $this->plugin = Iteras::get_instance();
     $this->plugin_slug = $this->plugin->get_plugin_slug();
 
-    $this->access_levels = array(
-      "" => __('Everybody', $this->plugin_slug),
-      //"user" => __('Registered accounts', $this->plugin_slug),
-      "sub" => __('Paying subscribers', $this->plugin_slug),
-    );
+    add_action( 'init', array( $this, 'load_settings' ) );
+    add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 
     // Load admin style sheet and JavaScript.
     //add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
-    //add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+    add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 
     // Add the options page and menu item.
     add_action( 'admin_menu', array( $this, 'add_plugin_admin_menu' ) );
@@ -47,6 +44,24 @@ class Iteras_Admin {
 
     add_action( 'load-post.php', array( $this, 'paywall_post_meta_boxes_setup' ) );
     add_action( 'load-post-new.php', array( $this, 'paywall_post_meta_boxes_setup' ) );
+  }
+
+  public function load_settings() {
+    $this->access_levels = array(
+      "" => __('Everybody', $this->plugin_slug),
+      //"user" => __('Registered accounts', $this->plugin_slug),
+      "sub" => __('Paying subscribers', $this->plugin_slug),
+    );
+
+    $this->paywall_display_types = array(
+      "redirect" => __('Redirect to subscribe landing page', $this->plugin_slug),
+      "samepage" => __('Cut text and add call-to-action box', $this->plugin_slug),
+    );
+  }
+
+  public function load_plugin_textdomain() {
+    // Load the plugin text domain for translation.
+    load_plugin_textdomain( $this->plugin_slug, false, plugin_basename(ITERAS_PLUGIN_PATH) . '/languages/' );
   }
 
 
@@ -76,6 +91,7 @@ class Iteras_Admin {
 
     $settings = $this->plugin->settings;
     $settings_url = admin_url( 'options-general.php?page=' . $this->plugin_slug );
+    $domain = $this->plugin_slug;
 
     include_once( 'views/post-meta-box.php' );
   }
@@ -164,6 +180,7 @@ class Iteras_Admin {
 
     // template context
     $settings = $this->plugin->settings;
+    $domain = $this->plugin_slug;
 
     include_once( 'views/admin.php' );
 
@@ -193,6 +210,9 @@ class Iteras_Admin {
       'subscribe_url' => sanitize_text_field($_POST['subscribe_url']),
       'user_url' => sanitize_text_field($_POST['user_url']),
       'default_access' => sanitize_text_field($_POST['default_access']),
+      'paywall_display_type' => sanitize_text_field($_POST['paywall_display_type']),
+      'paywall_box' => stripslashes($_POST['paywall_box']),
+      'paywall_snippet_size' => sanitize_text_field($_POST['paywall_snippet_size']),
     );
 
     $this->plugin->save_settings($settings);

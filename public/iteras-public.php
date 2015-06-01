@@ -6,7 +6,7 @@
  * @author    ITERAS Team <team@iteras.dk>
  * @license   GPL-2.0+
  * @link      http://www.iteras.dk
- * @copyright 2014 ITERAS ApS
+ * @copyright 2015 ITERAS ApS
  */
 
 /**
@@ -15,10 +15,11 @@
  */
 class Iteras {
 
-  const VERSION = '0.2';
+  const VERSION = '0.4.3';
 
   const SETTINGS_KEY = "iteras_settings";
   const POST_META_KEY = "iteras_paywall";
+  const DEFAULT_ARTICLE_SNIPPET_SIZE = 300;
 
   protected $plugin_slug = 'iteras';
 
@@ -28,6 +29,9 @@ class Iteras {
 
 
   private function __construct() {
+    // run migrations if needed
+    self::migrate();
+
     // Load plugin text domain
     add_action( 'init', array( $this, 'load_settings' ) );
     add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
@@ -36,10 +40,14 @@ class Iteras {
     add_action( 'wpmu_new_blog', array( $this, 'activate_new_site' ) );
 
     // Load public-facing style sheet and JavaScript.
-    //add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+    add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
     add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
     add_filter('the_content', array( $this, 'potentially_paywall_content' ));
+
+    add_shortcode( 'iteras-signup', array( $this, 'signup_shortcode') );
+    add_shortcode( 'iteras-paywall-login', array( $this, 'paywall_shortcode') );
+    add_shortcode( 'iteras-selfservice', array( $this, 'selfservice_shortcode') );
   }
 
 
@@ -147,15 +155,27 @@ class Iteras {
 
 
   private static function single_activate() {
-    $settings = get_option(self::SETTINGS_KEY);
-
-    if (!empty($settings) and version_compare(self::VERSION, $settings['version'], "gt")) {
-      $old_version = $settings['version'];
-      $new_version = self::VERSION;
-      // do version upgrades here
-    }
+    self::migrate();
   }
 
+  private static function migrate() {
+    $settings = get_option(self::SETTINGS_KEY);
+    $old_version = $settings['version'];
+    $new_version = self::VERSION;
+
+    if (!empty($settings) and version_compare($new_version, $old_version, "gt")) {
+      // do version upgrades here
+      if (version_compare($old_version, "0.3", "le")) {
+        $settings['paywall_display_type'] = 'redirect';
+        $settings['paywall_box'] = '';
+        $settings['paywall_snippet_size'] = self::DEFAULT_ARTICLE_SNIPPET_SIZE;
+      }
+
+      wp_cache_delete(self::SETTINGS_KEY);
+      $settings['version'] = $new_version;
+      update_option(self::SETTINGS_KEY, $settings);
+    }
+  }
 
   private static function single_deactivate() {
   }
@@ -163,12 +183,7 @@ class Iteras {
 
   public function load_plugin_textdomain() {
     // Load the plugin text domain for translation.
-
-    $domain = $this->plugin_slug;
-    $locale = apply_filters( 'plugin_locale', get_locale(), $domain );
-
-    load_textdomain( $domain, trailingslashit( WP_LANG_DIR ) . $domain . '/' . $domain . '-' . $locale . '.mo' );
-    load_plugin_textdomain( $domain, FALSE, basename( plugin_dir_path( dirname( __FILE__ ) ) ) . '/languages/' );
+    load_plugin_textdomain( $this->plugin_slug, false, plugin_basename(ITERAS_PLUGIN_PATH) . '/languages/' );
   }
 
 
@@ -182,6 +197,9 @@ class Iteras {
         'subscribe_url' => "",
         'user_url' => "",
         'default_access' => "",
+        'paywall_display_type' => "redirect",
+        'paywall_box' => "",
+        'paywall_snippet_size' => self::DEFAULT_ARTICLE_SNIPPET_SIZE,
         'version' => self::VERSION,
       );
 
@@ -201,20 +219,28 @@ class Iteras {
 
 
   public function enqueue_styles() {
+    global $wp_styles;
     wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css', __FILE__ ), array(), self::VERSION );
+    wp_enqueue_style( $this->plugin_slug . '-plugin-styles-ie', plugins_url( 'assets/css/ie.css', __FILE__ ), array(), self::VERSION );
+    $wp_styles->add_data( $this->plugin_slug . '-plugin-styles-ie', 'conditional', 'gte IE 9' );
   }
 
 
   public function enqueue_scripts() {
-    // include the itearas javascript api
-    if (WP_DEBUG)
-      $url = "http://iteras.localhost:8000/media/api/iteras.js"; //"http://app-test.iteras.dk/static/api/iteras.js";
+    // include the iteras javascript api
+    if (ITERAS_DEBUG) {
+      //$url = "http://iteras.localhost:8000/media/api/iteras.js"; //"http://app-test.iteras.dk/static/api/iteras.js";
+      //wp_enqueue_script( $this->plugin_slug . '-api-script-debug',  "http://iteras.localhost:8000/media/api/debug.js");
+      $url = "http://aura.beta.iola.dk/media/api/iteras.js";
+      wp_enqueue_script( $this->plugin_slug . '-api-script-debug',  "http://aura.beta.iola.dk/media/api/debug.js");
+    }
     else
       $url = "https://app.iteras.dk/static/api/iteras.js";
 
     wp_enqueue_script( $this->plugin_slug . '-api-script', $url );
 
-    //wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js', __FILE__ ), array( 'jquery' ), self::VERSION );
+    wp_enqueue_script( $this->plugin_slug . '-plugin-script-truncate', plugins_url( 'assets/js/truncate.js', __FILE__ ), array( 'jquery' ), self::VERSION );
+    wp_enqueue_script( $this->plugin_slug . '-plugin-script-box', plugins_url( 'assets/js/box.js', __FILE__ ), array( 'jquery' ), self::VERSION );
   }
 
   public function potentially_paywall_content($content) {
@@ -222,16 +248,80 @@ class Iteras {
 
     if ( is_single() ) {
       $paywall = get_post_meta( $post->ID, self::POST_META_KEY, true );
-
+      
       $extra = "";
       if (!$this->settings['subscribe_url'])
         $extra = '<!-- ITERAS paywall enabled but not configured properly  -->';
-      elseif (in_array($paywall, array("user", "sub")))
-        $extra = '<script>Iteras.wall({ redirect: "'.$this->settings['subscribe_url'].'", access: "'.$paywall.'" });</script>';
+      elseif (in_array($paywall, array("user", "sub"))) {
+        if ($this->settings['paywall_display_type'] == "samepage") {
 
-      $content = $extra.$content;
+          if ($this->settings['paywall_box']) {
+            // remove the the_content filter so we don't process twice
+            //remove_filter( current_filter(), array( $this, __FUNCTION__) );
+            $box_content = apply_filters( 'do_shortcode', $this->settings['paywall_box'] );
+          }
+          else
+            $box_content = "<p>" + __("ITERAS plugin improperly configured. Paywall box content is missing", $this->plugin_slug) + "</p>";
+            //$box_content = '<script>document.write(Iteras.paywalliframe({ profile: "'.$this->settings['profile_name'].'", paywallid: "'.$this->settings['paywall_id'].'" }));</script>';
+
+          $extra = sprintf(
+            file_get_contents(plugin_dir_path( __FILE__ ) . 'views/box.php'),
+            $this->settings['paywall_snippet_size'],
+            $box_content
+          );
+
+          $extra = $extra.'<script>Iteras.wall({ unauthorized: iterasPaywallContent, access: "'.$paywall.'" });</script>';
+        }
+        else {
+          $extra = '<script>Iteras.wall({ redirect: "'.$this->settings['subscribe_url'].'", access: "'.$paywall.'" });</script>';
+        }
+      }
+
+      $content = '<div class="iteras-content-wrapper">'.$content.'</div>'.$extra;
     }
 
     return $content;
+  }
+
+  function combine_attributes($attrs) {
+    if (!$attrs or empty($attrs))
+      return "";
+
+    $transformed = [];
+
+    foreach ($attrs as $key => $value)
+      if ($value)
+        array_push($transformed, '"'.$key.'": "'.$value.'"');
+
+    if (!empty($transformed))
+      return ", ".join(", ", $transformed);
+    else
+      return "";
+  }
+
+  // [iteras-signup signupid="3for1"]
+  function signup_shortcode($attrs) {
+    return '<script>
+      document.write(Iteras.signupiframe({
+        "profile": "'.$this->settings['profile_name'].'"'.$this->combine_attributes($attrs).'
+      }));</script>';
+  }
+
+  // [iteras-paywall-login]
+  function paywall_shortcode($attrs) {
+    return '<script>
+      document.write(Iteras.paywalliframe({
+        "profile": "'.$this->settings['profile_name'].'",
+        "paywallid": "'.$this->settings['paywall_id'].'"'.$this->combine_attributes($attrs).'
+      }));</script>';
+  }
+
+
+  // [iteras-selfservice]
+  function selfservice_shortcode($attrs) {
+    return '<script>
+      document.write(Iteras.selfserviceiframe({
+        "profile": "'.$this->settings['profile_name'].'"'.$this->combine_attributes($attrs).'
+      }));</script>';
   }
 }
