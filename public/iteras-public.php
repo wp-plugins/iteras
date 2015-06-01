@@ -6,7 +6,7 @@
  * @author    ITERAS Team <team@iteras.dk>
  * @license   GPL-2.0+
  * @link      http://www.iteras.dk
- * @copyright 2014 ITERAS ApS
+ * @copyright 2015 ITERAS ApS
  */
 
 /**
@@ -15,7 +15,7 @@
  */
 class Iteras {
 
-  const VERSION = '0.4.1';
+  const VERSION = '0.4.2';
 
   const SETTINGS_KEY = "iteras_settings";
   const POST_META_KEY = "iteras_paywall";
@@ -160,13 +160,12 @@ class Iteras {
 
   private static function migrate() {
     $settings = get_option(self::SETTINGS_KEY);
+    $old_version = $settings['version'];
+    $new_version = self::VERSION;
 
-    if (!empty($settings) and version_compare(self::VERSION, $settings['version'], "gt")) {
-      $old_version = $settings['version'];
-      $new_version = self::VERSION;
-
+    if (!empty($settings) and version_compare($new_version, $old_version, "gt")) {
       // do version upgrades here
-      if ($old_version == "0.3" && ($new_version == "0.4" || $new_version == "0.4.1")) {
+      if (version_compare($old_version, "0.3", "le")) {
         $settings['paywall_display_type'] = 'redirect';
         $settings['paywall_box'] = '';
         $settings['paywall_snippet_size'] = self::DEFAULT_ARTICLE_SNIPPET_SIZE;
@@ -220,7 +219,10 @@ class Iteras {
 
 
   public function enqueue_styles() {
+    global $wp_styles;
     wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'assets/css/public.css', __FILE__ ), array(), self::VERSION );
+    wp_enqueue_style( $this->plugin_slug . '-plugin-styles-ie', plugins_url( 'assets/css/ie.css', __FILE__ ), array(), self::VERSION );
+    $wp_styles->add_data( $this->plugin_slug . '-plugin-styles-ie', 'conditional', 'gte IE 9' );
   }
 
 

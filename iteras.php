@@ -6,13 +6,13 @@
  * @author    ITERAS Team <team@iteras.dk>
  * @license   GPL-2.0+
  * @link      http://www.iteras.dk
- * @copyright 2014 ITERAS ApS
+ * @copyright 2015 ITERAS ApS
  *
  * @wordpress-plugin
  * Plugin Name:       ITERAS
  * Plugin URI:        http://app.iteras.dk
  * Description:       Integration with ITERAS, a cloud-based state-of-the-art system for managing subscriptions and payments for magazines.
- * Version:           0.4.1
+ * Version:           0.4.2
  * Author:            ITERAS
  * Author URI:        http://www.iteras.dk
  * Text Domain:       iteras
