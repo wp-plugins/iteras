@@ -2,7 +2,7 @@
 Tags: paywall, subscribe, subscriptions, subscription, subscribers, access-control, paid content, premium, premium content, monetize, magazine, media pass, registration, billing, membership, member, earn money
 Requires at least: 3.5.1
 Tested up to: 4.2.2
-Stable tag: 0.4.2
+Stable tag: 0.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,7 +33,7 @@ No. But it’s not hard to get one - if you are interested in learning more abou
 
 == Changelog ==
 
-= 0.4.2 =
+= 0.4.3 =
 * Fixed CSS gradient for call-to-action box
 
 = 0.4.1 =

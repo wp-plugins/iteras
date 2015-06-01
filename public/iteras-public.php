@@ -15,7 +15,7 @@
  */
 class Iteras {
 
-  const VERSION = '0.4.2';
+  const VERSION = '0.4.3';
 
   const SETTINGS_KEY = "iteras_settings";
   const POST_META_KEY = "iteras_paywall";
