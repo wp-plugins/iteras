@@ -1,0 +1,176 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid   ""
+msgstr  "Project-Id-Version: iteras\n"
+        "Report-Msgid-Bugs-To: team@iteras.dk\n"
+        "POT-Creation-Date: 2015-05-28 14:19+0200\n"
+        "PO-Revision-Date: 2014-10-28 14:44+0100\n"
+        "Last-Translator: Ole Laursen <olau@iteras.dk>\n"
+        "Language-Team: da\n"
+        "Language: da\n"
+        "MIME-Version: 1.0\n"
+        "Content-Type: text/plain; charset=utf-8\n"
+        "Content-Transfer-Encoding: 8bit\n"
+
+#: iteras/admin/iteras-admin.php:51
+msgid   "Everybody"
+msgstr  "Alle"
+
+#: iteras/admin/iteras-admin.php:53
+msgid   "Paying subscribers"
+msgstr  "Betalende abonnenter"
+
+#: iteras/admin/iteras-admin.php:57
+msgid   "Redirect to subscribe landing page"
+msgstr  "Omdiriger til abonnér-landingsside"
+
+#: iteras/admin/iteras-admin.php:58
+msgid   "Cut text and add call-to-action box"
+msgstr  "Beskær tekst og tilføj call to action-boks"
+
+#: iteras/admin/iteras-admin.php:75
+msgid   "ITERAS Paywall"
+msgstr  "ITERAS-paywall"
+
+#: iteras/admin/iteras-admin.php:87
+msgid   "Does not restrict visitors, everyone can see the content"
+msgstr  "Begrænser ingen besøgende, alle kan se indholdet"
+
+#: iteras/admin/iteras-admin.php:88
+msgid   "Content restricted to visitors who are in the subscriber database "
+        "(but they are not required to have an active subscription)"
+msgstr  "Indhold begrænset til besøgende i abonnentdatabasen (men de behøver "
+        "ikke have et aktivt abonnement)"
+
+#: iteras/admin/iteras-admin.php:89
+msgid   "Content restricted to visitors with an active subscription"
+msgstr  "Indhold begrænset til besøgende i abonnentdatabasen"
+
+#: iteras/admin/iteras-admin.php:166
+msgid   "ITERAS configuration"
+msgstr  "ITERAS-konfiguration"
+
+#: iteras/admin/iteras-admin.php:167
+msgid   "ITERAS"
+msgstr  "ITERAS"
+
+#: iteras/admin/iteras-admin.php:195
+msgid   "Settings"
+msgstr  "Indstillinger"
+
+#: iteras/admin/views/admin.php:8
+msgid   "ITERAS profile name"
+msgstr  "ITERAS-profilnavn"
+
+#: iteras/admin/views/admin.php:10
+msgid   "e.g. sportsmanden"
+msgstr  "f.eks. sportsmanden"
+
+#: iteras/admin/views/admin.php:11
+msgid   "You can find your ITERAS profile name on the publication settings "
+        "page here:"
+msgstr  "Du kan finde dit ITERAS-profilnavn på siden med "
+        "publikationsindstillinger her:"
+
+#: iteras/admin/views/admin.php:16
+msgid   "ITERAS paywall ID"
+msgstr  "ITERAS-paywall-id"
+
+#: iteras/admin/views/admin.php:18
+msgid   "e.g. CEru2uMu"
+msgstr  "f.eks. CEru2uMu"
+
+#: iteras/admin/views/admin.php:19
+msgid   "You can find your ITERAS paywall ID on the publication settings page "
+        "here:"
+msgstr  "Du kan finde dit ITERAS-paywall-id på siden med "
+        "publikationsindstillinger her:"
+
+#: iteras/admin/views/admin.php:24
+msgid   "Default paywall access"
+msgstr  "Forvalgt paywall-adgang"
+
+#: iteras/admin/views/admin.php:32
+msgid   "Default paywall access for new posts."
+msgstr  "Forvalgt paywall-adgang for nye indlæg."
+
+#: iteras/admin/views/admin.php:37
+msgid   "Subscribe landing page"
+msgstr  "Abonnér-landingsside"
+
+#: iteras/admin/views/admin.php:39
+msgid   "e.g. /?page_id=1"
+msgstr  "f.eks. /?page_id=1"
+
+#: iteras/admin/views/admin.php:40
+msgid   "URL to the landing page for logging in or becoming a <b>paying "
+        "subscriber</b>."
+msgstr  "URL for landingsside til at logge ind eller blive en <b>betalende "
+        "abonnent</b>."
+
+#: iteras/admin/views/admin.php:45
+msgid   "User landing page"
+msgstr  "Bruger-landingsside"
+
+#: iteras/admin/views/admin.php:47
+msgid   "e.g. /?page_id=2"
+msgstr  "f.eks. /?page_id=2"
+
+#: iteras/admin/views/admin.php:48
+msgid   "URL to the landing page for logging in or registering as a <b>user</"
+        "b>. The subscribe and user landing page can point to the same "
+        "Wordpress page."
+msgstr  "URL for landingsside til at logge ind eller registrere sig som en "
+        "<b>bruger</b>. Abonnér- og bruger-landingssiderne kan pege på den "
+        "samme Wordpress-side."
+
+#: iteras/admin/views/admin.php:53
+msgid   "Access restriction"
+msgstr  "Adgangsbegrænsning"
+
+#: iteras/admin/views/admin.php:61
+msgid   "How users will be greeted on an article they don't have access to."
+msgstr  "Hvordan besøgende bliver modtaget på en artikel som de ikke har "
+        "adgang til."
+
+#: iteras/admin/views/admin.php:66
+msgid   "Cut text at"
+msgstr  "Beskær tekst ved"
+
+#: iteras/admin/views/admin.php:68
+msgid   "characters"
+msgstr  "tegn"
+
+#: iteras/admin/views/admin.php:68
+msgid   "e.g. 30"
+msgstr  "f.eks. 30"
+
+#: iteras/admin/views/admin.php:72
+msgid   "Call-to-action content"
+msgstr  "Call to action-indhold"
+
+#: iteras/admin/views/admin.php:82
+msgid   "For more information about the ITERAS API check out the <a target="
+        "\"_blank\" href=\"https://app.iteras.dk/static/api/readme.txt"
+        "\">developer readme.txt</a>."
+msgstr  "For flere oplysninger om ITERAS API'et, læs <a target=\"_blank\" "
+        "href=\"https://app.iteras.dk/static/api/readme.txt\">readme.txt til "
+        "udvikler</a>."
+
+#: iteras/admin/views/post-meta-box.php:5
+msgid   "Who should be able to access this post?"
+msgstr  "Hvem skal have adgang til dette indlæg?"
+
+#: iteras/admin/views/post-meta-box.php:17
+#, php-format
+msgid   "The ITERAS settings haven't been filled in properly. Go to the <a "
+        "href='%url%'>settings page</a> to correct them."
+msgstr  "ITERAS-indstillingerne er ikke blevet udfyldt korrekt. Gå til <a "
+        "href='%url%'>siden med indstillinger</a> for at rette dem."
+
+#: iteras/public/iteras-public.php:252
+msgid   "ITERAS plugin improperly configured. Paywall box content is missing"
+msgstr  "ITERAS-plugin er ikke konfigureret rigtigt. Call to action-indhold "
+        "mangler."
